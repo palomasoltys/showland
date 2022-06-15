@@ -21,8 +21,21 @@ def homepage():
 
 @app.route('/movies')
 def all_movies():
-    """Display all movies"""
     return render_template('movies.html')
+
+# API Request to show the most popular movies
+
+
+@app.route('/movies/popular')
+def all_popular_movies():
+    """Display all popular movies"""
+    tmdb_api_key = os.environ['TMDB_API_KEY']
+    print(tmdb_api_key)
+    response = requests.get(
+        f"https://api.themoviedb.org/3/movie/popular?api_key={tmdb_api_key}&language=en-US&page=1")
+    data = response.json()
+    print(data)
+    return data
 
 # API Request using the query string from movies.js
 
@@ -61,17 +74,33 @@ def show_specific_show():
 
 
 @app.route('/login')
-def login():
+def login_page():
     """Show log in page"""
     return render_template('login.html')
 
 
-@app.route('/signin')
+@app.route('/login', methods=['POST'])
+def login_user():
+    """User log in"""
+
+    email = request.form.get("email")
+    password = request.form.get("password")
+
+    user = crud.get_user_by_email(email)
+    if user and password == user.password:
+        flash(f'Hi, {user.full_name}')
+        return redirect('/')
+    else:
+        flash(f'Email or password incorrect')
+        return redirect('login')
+
+
+@app.route('/signup')
 def signin_page():
-    return render_template('signin.html')
+    return render_template('signup.html')
 
 
-@app.route('/signin', methods=["POST"])
+@app.route('/signup', methods=["POST"])
 def register_user():
     """Create a new user"""
 
