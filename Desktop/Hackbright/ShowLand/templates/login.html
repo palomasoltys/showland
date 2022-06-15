@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %} Log in here {% endblock %}
+
+{% block head %} {% endblock %}
+
+{% block body %}
+
+<section>
+    <form action="/login" method="POST">
+
+        <p>
+            Email <input type="text" name="email" required>
+        </p>
+
+        <p>
+            Password <input type="password" name="password" required>
+        </p>
+
+        <p>
+            <input type="submit" value="Log In">
+        </p>
+    </form>
+</section>
+
+{% endblock %}

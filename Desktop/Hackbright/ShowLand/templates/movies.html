@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %} Movies {% endblock %}
+
+{% block head %} {% endblock %}
+
+{% block body %}
+<!-- <nav id="header-nav">
+    <a href="/">Home</a>
+    <a href="/movies">Movies</a>
+    <a href="/shows">Shows</a>
+    <a href="/login">Log In</a>
+    <a href="/signin">Sign In</a>
+</nav> -->
+<div class="container-fluid">
+    <nav id="search-movie-nav">
+        <form id="search-movie-form">
+            <label for="search-btn">What movie are you looking for?</label>
+            <input type="text" id="search-btn" name="search-btn">
+            <input type="submit" value="Search">
+        </form>
+
+        <div class="row movie-response">
+        </div>
+
+
+    </nav>
+
+    <nav id="popular-movies-nav">
+        <h2>MOST POPULAR MOVIES</h2>
+        <div></div>
+    </nav>
+</div>
+{% endblock %}
