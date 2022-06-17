@@ -23,12 +23,18 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    <a class="nav-link" href="/movies">Movies</a>
-                    <a class="nav-link" href="/shows">Shows</a>
-                    <a class="nav-link" href="/login">Log In</a>
-                    <a class="nav-link" href="/signup">Sign Up</a>
-                    <a class="nav-link disabled">Disabled</a>
+                    <a class="nav-link active" aria-current="page" id="navbar-home" href="/">Home</a>
+                    <a class="nav-link" id="navbar-movies" href="/movies">Movies</a>
+                    <a class="nav-link" id="navbar-shows" href="/shows">Shows</a>
+                    {%if 'user_email' not in session%}
+                    <a class="nav-link" id="navbar-login" href="/login">Log In</a>
+                    <a class="nav-link" id="navbar-signup" href="/signup">Sign Up</a>
+                    {%else%}
+                    <a class="nav-link" id="navbar-login" href="/login">Profile</a>
+                    <a class="nav-link" id="navbar-logout" href="/logout">Log Out</a>
+                    <!-- <a class="nav-link" id="navbar-signup" href="/signup">Sign Up</a>                    
+                    <a class="nav-link disabled">Disabled</a> -->
+                    {%endif%}
                 </div>
             </div>
         </div>
@@ -44,7 +50,7 @@
     {% block body %}{% endblock %}
 
     {% block after_body %}{% endblock %}
-    <script src="../static/js/movies.js"></script>
+    <!-- <script src="../static/js/base.js"></script> -->
 </body>
 
 </html>

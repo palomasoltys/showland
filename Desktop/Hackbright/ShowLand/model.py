@@ -42,9 +42,10 @@ class Media(db.Model):
     poster_path = db.Column(db.String)
     release_date = db.Column(db.DateTime)
     vote_average = db.Column(db.Float)
+    imdb_id = db.Column(db.String, unique=True)
 
     def __repr__(self):
-        return f"<Media media_id = {self.media_id} / media_type = {self.media_type} / title = {self.title}"
+        return f"<Media media_id = {self.media_id} / media_type = {self.media_type} / title = {self.title} / imdb_id = {self.imdb_id}"
 
 
 class Comment(db.Model):
@@ -57,6 +58,7 @@ class Comment(db.Model):
     media_id = db.Column(db.Integer, db.ForeignKey("media.media_id"))
     user_id = db.Column(db.Integer, db.ForeignKey(
         "users.user_id"), nullable=False)
+
 
     media = db.relationship("Media", backref="comments")
     user = db.relationship("User", backref="comments")
@@ -71,7 +73,7 @@ class SaveForLater(db.Model):
 
     save_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
-        "users.user_id"), nullable=False)
+        "users.user_id"), nullable=False)     
     media_id = db.Column(db.Integer, db.ForeignKey("media.media_id"))
 
     media = db.relationship("Media", backref="savelater")
@@ -87,7 +89,7 @@ class Like(db.Model):
 
     like_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     media_id = db.Column(db.Integer, db.ForeignKey(
-        "media.media_id"), nullable=False)
+        "media.media_id"), nullable=False)  
     user_id = db.Column(db.Integer, db.ForeignKey(
         "users.user_id"), nullable=False)
 

@@ -34,7 +34,6 @@ def all_popular_movies():
     response = requests.get(
         f"https://api.themoviedb.org/3/movie/popular?api_key={tmdb_api_key}&language=en-US&page=1")
     data = response.json()
-    print(data)
     return data
 
 # API Request using the query string from movies.js
@@ -52,7 +51,11 @@ def search_media():
     response = requests.request(
         "GET", url, headers=headers, params=query_string)
     data = response.json()
+
+   # session[searched_media] = data['Search']
+
     return data
+
 
 
 @app.route('/shows')
@@ -61,10 +64,67 @@ def all_shows():
     pass
 
 
-@app.route('/movies/<movie_id>')
-def show_specific_movie():
-    """Show details on a particular movie"""
-    pass
+@app.route('/movies/details/<imdb_id>')
+def get_specific_movie(imdb_id):
+    """Makes an API request to get a specific movie by its ID"""
+
+    url = "https://movie-database-alternative.p.rapidapi.com/"
+   # imdb_id = request.args.get("i")
+    query_string = {"r": "json", "i": imdb_id}
+
+    headers = {
+        "X-RapidAPI-Key": os.environ['RAPID_API_KEY'],
+        "X-RapidAPI-Host": "movie-database-alternative.p.rapidapi.com"
+    }
+    response = requests.request(
+        "GET", url, headers=headers, params=query_string)
+
+    data = response.json()
+    print(data)
+
+    movie = {'title': data['Title'], 'year': data['Year'], 'poster_path': data['Poster'], 'overview': data['Plot'], 'movie_id': data['imdbID'] }
+    return render_template('movie_details.html', movie=movie)
+
+
+@app.route('/movies/details/')
+def show_details():
+    return render_template('movie_details.html')
+
+@app.route('/movie/details/<movie_id>/comment', methods=['POST'])
+def comment_movie(movie_id):
+
+
+    movie_title = request.json.get('title')
+    movie_year = request.json.get('year')
+    movie_poster_path = request.json.get('poster_path')
+    movie_overview = request.json.get('overview')
+    movie_imdb_id = request.json.get('imdb_id')
+    movie_rate = request.json.get('user_rate')
+    movie_comment = request.json.get('user_comment')
+
+    if 'user_email' in session:
+
+        user = crud.get_user_by_email(session['user_email'])
+        movie = crud.get_media_by_imdb_id(movie_id)
+        if movie:
+            user_comment = crud.create_comment(comment=movie_comment, review=movie_rate, user_id=user.user_id, media_id=movie.media_id)
+            db.session.add(user_comment)
+            db.session.commit()
+        else:
+            movie_to_db = crud.create_media(media_type='movie', title=movie_title, overview=movie_overview, poster_path=movie_poster_path, imdb_id=movie_imdb_id)
+            db.session.add(movie_to_db)
+            db.session.commit()      
+
+            user_comment = crud.create_comment(comment=movie_comment, review=movie_rate, user_id=user.user_id, media_id=movie_to_db.media_id)
+
+            db.session.add(user_comment)
+            db.session.commit()
+        
+    else:
+        return redirect('/login')
+
+    return redirect('/movies')
+
 
 
 @app.route('/shows/<show_id>')
@@ -76,7 +136,11 @@ def show_specific_show():
 @app.route('/login')
 def login_page():
     """Show log in page"""
-    return render_template('login.html')
+    if 'user_email' in session:
+        user = crud.get_user_by_email(session['user_email'])
+        return render_template('profile.html', user=user)
+    else:    
+        return render_template('login.html')
 
 
 @app.route('/login', methods=['POST'])
@@ -89,11 +153,18 @@ def login_user():
     user = crud.get_user_by_email(email)
     if user and password == user.password:
         flash(f'Hi, {user.full_name}')
+        session['user_email'] = user.email
         return redirect('/')
     else:
         flash(f'Email or password incorrect')
         return redirect('login')
 
+@app.route('/logout')
+def logout():
+
+    session.pop('user_email',None)
+    flash("You're logged out!")
+    return redirect('/')
 
 @app.route('/signup')
 def signin_page():
