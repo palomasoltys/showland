@@ -42,25 +42,26 @@ fetch('/movies/popular')
       const title = d.title;
       const poster_path = d.poster_path;
       const year = d.release_date;
-      const movie = `<li><h2>${title}<p>${year}</p></h2> <img src="https://image.tmdb.org/t/p/w300${poster_path}" </li>`;
+      const id = d.id;
+      const movie = `<li><h2><a href="/movies/details/${id} id="movie-details-${id}">${title}</a><p>${year}</p></h2> <img src="https://image.tmdb.org/t/p/w300${poster_path}" </li>`;
       document
         .querySelector('.popular-movie')
         .insertAdjacentHTML('beforeend', `<div class="col-4">${movie}</div>`);
     }
   });
 
-function send_movie_data_to_server(title, poster_path, year, overview, id) {
-  fetch(`/movies/${id}/details`, {
-    method: 'POST',
-    body: JSON.stringify({
-      title: title,
-      poster_path: poster_path,
-      year: year,
-      overview: overview,
-      id: id,
-    }),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-}
+// function send_movie_data_to_server(title, poster_path, year, overview, id) {
+//   fetch(`/movies/${id}/details`, {
+//     method: 'POST',
+//     body: JSON.stringify({
+//       title: title,
+//       poster_path: poster_path,
+//       year: year,
+//       overview: overview,
+//       id: id,
+//     }),
+//     headers: {
+//       'Content-Type': 'application/json',
+//     },
+//   });
+// }

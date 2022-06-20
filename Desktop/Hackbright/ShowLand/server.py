@@ -69,7 +69,7 @@ def get_specific_movie(imdb_id):
     """Makes an API request to get a specific movie by its ID"""
 
     url = "https://movie-database-alternative.p.rapidapi.com/"
-   # imdb_id = request.args.get("i")
+
     query_string = {"r": "json", "i": imdb_id}
 
     headers = {
@@ -80,7 +80,7 @@ def get_specific_movie(imdb_id):
         "GET", url, headers=headers, params=query_string)
 
     data = response.json()
-    print(data)
+
 
     movie = {'title': data['Title'], 'year': data['Year'], 'poster_path': data['Poster'], 'overview': data['Plot'], 'movie_id': data['imdbID'] }
     return render_template('movie_details.html', movie=movie)
@@ -107,15 +107,28 @@ def comment_movie(movie_id):
         user = crud.get_user_by_email(session['user_email'])
         movie = crud.get_media_by_imdb_id(movie_id)
         if movie:
-            user_comment = crud.create_comment(comment=movie_comment, review=movie_rate, user_id=user.user_id, media_id=movie.media_id)
+            user_comment = crud.create_comment(
+                                comment=movie_comment,
+                                review=movie_rate, 
+                                user_id=user.user_id, 
+                                media_id=movie.media_id)
             db.session.add(user_comment)
             db.session.commit()
         else:
-            movie_to_db = crud.create_media(media_type='movie', title=movie_title, overview=movie_overview, poster_path=movie_poster_path, imdb_id=movie_imdb_id)
+            movie_to_db = crud.create_media(
+                               media_type='movie', 
+                               title=movie_title, 
+                               overview=movie_overview, 
+                               poster_path=movie_poster_path, 
+                               imdb_id=movie_imdb_id)
             db.session.add(movie_to_db)
             db.session.commit()      
 
-            user_comment = crud.create_comment(comment=movie_comment, review=movie_rate, user_id=user.user_id, media_id=movie_to_db.media_id)
+            user_comment = crud.create_comment(
+                                comment=movie_comment, 
+                                review=movie_rate, 
+                                user_id=user.user_id, 
+                                media_id=movie_to_db.media_id)
 
             db.session.add(user_comment)
             db.session.commit()
@@ -138,7 +151,9 @@ def login_page():
     """Show log in page"""
     if 'user_email' in session:
         user = crud.get_user_by_email(session['user_email'])
-        return render_template('profile.html', user=user)
+        user_id = user.user_id
+        return redirect(f'/profile/{user_id}')
+      #  return render_template('profile.html', user=user)
     else:    
         return render_template('login.html')
 
@@ -199,9 +214,15 @@ def register_user():
 
 
 @app.route('/profile/<user_id>')
-def show_profile():
+def show_profile(user_id):
     """Show users profile"""
-    pass
+
+    user = crud.get_user_by_email(session['user_email'])
+    user_id = user_id
+
+    
+
+    return render_template('profile.html', user=user)
 
 
 if __name__ == "__main__":
