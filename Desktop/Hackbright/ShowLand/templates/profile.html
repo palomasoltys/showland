@@ -12,10 +12,17 @@
     {% for item in user.comments %}
     {% if item.comment|length > 0 %}
     <li>
-        <!-- <img src="{{item.media.poster_path}}"> for some reason its BLANK -->
-        <p><a href="/movies/details/{{item.media.imdb_id}}">{{item.media.title}}</a></p>
+        {%if item.media.imdb_id[0] == 't' %}
+        <p><a href="/media/details/{{item.media.imdb_id}}">{{item.media.title}}</a></p>
+        {%elif item.media.media_type == 'series'%}
+        <p><a href="/media/popular/shows/details/{{item.media.imdb_id}}">{{item.media.title}}</a></p>
+        {%else%}
+        <p><a href="/media/popular/movies/details/{{item.media.imdb_id}}">{{item.media.title}}</a></p>
+        {%endif%}
+        <img src="{{item.media.poster_path}}">
         <p>{{item.review}}</p>
         <p>{{item.comment}}</p>
+        <p hidden>{{item.media.imdb_id}}</p>
     </li>
     {%endif%}
     {%endfor%}

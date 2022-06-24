@@ -4,15 +4,14 @@
 
 const movieTitle = document.querySelector('#movie-title').innerText;
 const movieYear = document.querySelector('#movie-year').innerText;
-const moviePosterPath = document.querySelector('#movie-poster-path').innerText;
+const moviePosterPath = document.querySelector('#movie-poster-path').src;
 const movieOverview = document.querySelector('#movie-overview').innerText;
 const movieID = document.querySelector('#movie-id').innerText;
 
-const commentForm = document.querySelector('#comment-form');
-
-commentForm.addEventListener('submit', (evt) => {
+const commentFormMovie = document.querySelector('#comment-form-movie');
+commentFormMovie.addEventListener('submit', (evt) => {
   evt.preventDefault();
-
+  console.log(movieOverview);
   const select = document.querySelector('#rate-movie');
   const movieRate = select.options[select.selectedIndex].value;
   const movieComment = document.querySelector('#comment-movie').value;
@@ -27,21 +26,11 @@ commentForm.addEventListener('submit', (evt) => {
     user_comment: movieComment,
   };
 
-  console.log(movieComment);
-  console.log(movieRate);
-
-  fetch(`/movie/details/${movieID}/comment`, {
+  fetch(`/media/popular/movies/details/${movieID}/comment`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(movieInformation),
   });
-});
-
-const submitCommentbtn = document.querySelector('#submit-comment-btn');
-submitCommentbtn.addEventListener('click', () => {
-  document.querySelector('#exampleModal').innerHTML = (
-    <p>Your comment was submited!</p>
-  );
 });

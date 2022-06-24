@@ -1,5 +1,5 @@
 """CRUD operations"""
-from model import db, User, Media, Comment, SaveForLater
+from model import db, User, Media, Comment, SaveForLater, Like
 
 
 def create_user(full_name, email, password):
@@ -28,11 +28,40 @@ def get_media_by_imdb_id(imdb_id):
 
     return Media.query.filter_by(imdb_id=imdb_id).first()
 
+# def get_movie_by_imdb_id(imdb_id):
+
+#     return Media.query.filter_by(imdb_id=imdb_id).first()  
+
+
+# def get_show_by_tmdb_id(tmdb_id):
+
+#     return Media.query.filter_by(tmdb_id=tmdb_id).first()    
+
 def create_comment(comment, review, media_id, user_id,):
 
     comment = Comment(comment=comment, review=review, media_id=media_id, user_id=user_id)
 
     return comment
+
+def create_like(user_id, comment_id):
+
+    like = Like(user_id=user_id, comment_id=comment_id) 
+    
+    return like
+
+def get_like_by_comment_user_id(comment_id, user_id):
+
+    like_by_id = Like.query.filter_by(comment_id=comment_id, user_id=user_id ).first()
+
+    return like_by_id   
+
+def get_like_numbers_by_comment_id(comment_id):
+
+    like = Like.query.filter_by(comment_id=comment_id)
+    like_numbers = like.count()
+
+    return like_numbers
+
 
 
 if __name__ == "__main__":

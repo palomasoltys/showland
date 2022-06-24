@@ -43,6 +43,7 @@ class Media(db.Model):
     release_date = db.Column(db.DateTime)
     vote_average = db.Column(db.Float)
     imdb_id = db.Column(db.String, unique=True)
+    tmdb_id = db.Column(db.Integer, unique=True)
 
     def __repr__(self):
         return f"<Media media_id = {self.media_id} / media_type = {self.media_type} / title = {self.title} / imdb_id = {self.imdb_id}"
@@ -88,12 +89,12 @@ class Like(db.Model):
     __tablename__ = "likes"
 
     like_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    media_id = db.Column(db.Integer, db.ForeignKey(
-        "media.media_id"), nullable=False)  
+    comment_id = db.Column(db.Integer, db.ForeignKey(
+        "comments.comment_id"), nullable=False)  
     user_id = db.Column(db.Integer, db.ForeignKey(
         "users.user_id"), nullable=False)
 
-    media = db.relationship("Media", backref="likes")
+    comment = db.relationship("Comment", backref="likes")
     user = db.relationship("User", backref="likes")
 
     def __repr__(self):
