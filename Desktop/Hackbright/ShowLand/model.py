@@ -16,6 +16,14 @@ def connect_to_db(flask_app, db_uri="postgresql:///showland", echo=False):  # na
     print("Connected to the db!")
 
 
+friend = db.Table(
+    'friends',
+    db.Column('friend_id', db.Integer, primary_key=True),
+    db.Column('f1_id', db.Integer, db.ForeignKey('users.user_id')),
+    db.Column('f2_id', db.Integer, db.ForeignKey('users.user_id'))
+    )
+
+
 class User(db.Model):
     """User information"""
 
@@ -25,6 +33,19 @@ class User(db.Model):
     full_name = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
+
+    following = db.relationship(
+        'User',
+        secondary=friend,
+        primaryjoin=user_id == friend.c.f1_id,
+        secondaryjoin=user_id == friend.c.f2_id,
+        backref='followers'
+    )
+
+
+    def get_all_friends(self):
+        """ Get all friends, those you are following AND those following you. """
+        return self.following + self.followers
 
     def __repr__(self):
         return f"User user_id = {self.user_id} / email = {self.email}"
@@ -98,7 +119,12 @@ class Like(db.Model):
     user = db.relationship("User", backref="likes")
 
     def __repr__(self):
-        return f"<Like like_id = {self.like_id} / media_id = {self.media_id} / user_id = {self.user_id}>"
+        return f"<Like like_id = {self.like_id} / media_id = {self.comment_id} / user_id = {self.user_id}>"
+
+
+
+
+
 
 
 # THIS TABLE IS GOING TO BE IMPLEMENTED LATER

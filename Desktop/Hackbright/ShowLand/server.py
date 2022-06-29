@@ -16,11 +16,10 @@ app.jinja_env.undefined = StrictUndefined
 @app.route('/')
 def homepage():
     """Display homepage"""
+
     if 'user_email' in session:
-        print(session)
-        print(session['user_email'])
         user = crud.get_user_by_email(session['user_email'])
-        print(user)
+        print(session['user_email'])
         return render_template('homepage.html', user=user)
     else:
         return render_template('homepage.html')
@@ -29,6 +28,7 @@ def homepage():
 
 @app.route('/media')
 def all_medias():
+    """Display all medias"""
     return render_template('medias.html')
 
 # API Request to show the most popular movies
@@ -45,7 +45,7 @@ def all_popular_movies():
 
 @app.route('/media/popular/shows')
 def all_popular_shows():
-    """Display all popular shows"""
+    """Display the most popular shows from TMDB API"""
     tmdb_api_key = os.environ['TMDB_API_KEY']
     response = requests.get(
         f"https://api.themoviedb.org/3/tv/popular?api_key={tmdb_api_key}&language=en-US&page=1")
@@ -56,6 +56,7 @@ def all_popular_shows():
 
 @app.route('/media/popular/shows/details/<tmdb_id>')
 def get_popular_shows(tmdb_id):
+    """Display the details of a specific show from TMDB API"""
 
     tmdb_api_key = os.environ['TMDB_API_KEY']
     url = f'https://api.themoviedb.org/3/tv/{tmdb_id}?api_key={tmdb_api_key}&language=en-US'
@@ -70,19 +71,21 @@ def get_popular_shows(tmdb_id):
             'show_id': data['id']}
 
     show_info = crud.get_media_by_imdb_id(str(show['show_id']))
+    user = crud.get_user_by_email(session['user_email'])
 
-    return render_template('show_popular_details.html', show=show, show_info=show_info )
+    return render_template('show_popular_details.html', show=show, show_info=show_info, user=user )
 
 
 @app.route('/media/popular/movies/details/<tmdb_id>')
 def get_popular_movie(tmdb_id):
+    """Display the details of a specific movie from TMDB API"""
+
 
     tmdb_api_key = os.environ['TMDB_API_KEY']
     url = f'https://api.themoviedb.org/3/movie/{tmdb_id}?api_key={tmdb_api_key}&language=en-US'
 
     response = requests.get(url)
     data = response.json()
-
     movie = {'movie_title': data['original_title'], 
              'movie_release_date': data['release_date'], 
              'movie_poster_path': data['poster_path'], 
@@ -92,10 +95,13 @@ def get_popular_movie(tmdb_id):
 
     movie_info = crud.get_media_by_imdb_id(str(movie['movie_id']))
 
-    return render_template('movie_popular_details.html', movie=movie, movie_info=movie_info )
+    user = crud.get_user_by_email(session['user_email'])
+
+    return render_template('movie_popular_details.html', movie=movie, movie_info=movie_info, user=user )
 
 @app.route('/media/popular/movies/details/<imdb_id>/comment', methods=['POST'])
 def comment_movie(imdb_id):
+    """Submit a comment for a specific movie from TMDB API and save both on the database"""
 
 
     movie_title = request.json.get('title')
@@ -145,6 +151,7 @@ def comment_movie(imdb_id):
 
 @app.route('/media/popular/shows/details/<imdb_id>/comment', methods=['POST'])
 def comment_show(imdb_id):
+    """Submit a comment for a specific show from TMDB API and save both on the database"""
 
 
     show_title = request.json.get('title')
@@ -189,8 +196,152 @@ def comment_show(imdb_id):
     return 'sucess'
 
 
+@app.route('/media/popular/movies/details/<comment_id>/update_like', methods=['POST'])
+def like_comment_popular_movie(comment_id):
+    """Like/Unlike a comment and update in the database (TMDB API)"""
+
+    # user_id = request.json.get('userID')
+    logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
+    user_id = logged_in_user.user_id
+    print("\n"*5)
+    print("User ID", user_id)
+   # like_id = request.json.get('likeID')
+
+    like_by_id = crud.get_like_by_comment_user_id(comment_id=comment_id, user_id=user_id)
+    print("Like exists?", like_by_id)
+    print("\n"*5)
+
+    if like_by_id:
+        db.session.delete(like_by_id)  
+    else:      
+        like = crud.create_like(user_id=user_id, 
+                            comment_id=comment_id)    
+        db.session.add(like)
+    db.session.commit()
+
+    number_likes = crud.get_like_numbers_by_comment_id(comment_id)
+
+    # if the like exists for that comment, delete it from the datavase, else add the like to the db.
+
+    return str(number_likes)
+
+
+@app.route('/media/popular/shows/details/<comment_id>/update_like', methods=['POST'])
+def like_comment_popular_show(comment_id):
+    """Like/Unlike a comment and update in the database (TMDB API)"""
+
+    # user_id = request.json.get('userID')
+    logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
+    user_id = logged_in_user.user_id
+    print("\n"*5)
+    print("User ID", user_id)
+   # like_id = request.json.get('likeID')
+
+    like_by_id = crud.get_like_by_comment_user_id(comment_id=comment_id, user_id=user_id)
+    print("Like exists?", like_by_id)
+    print("\n"*5)
+
+    if like_by_id:
+        db.session.delete(like_by_id)  
+    else:      
+        like = crud.create_like(user_id=user_id, 
+                            comment_id=comment_id)    
+        db.session.add(like)
+    db.session.commit()
+
+    number_likes = crud.get_like_numbers_by_comment_id(comment_id)
+    print(number_likes)
+
+    # if the like exists for that comment, delete it from the datavase, else add the like to the db.
+
+    return str(number_likes)
+
+
+@app.route('/media/popular/movies/details/<imdb_id>/save_for_later', methods=['POST'])
+def save_for_later_movie(imdb_id):
+    """Add/Remove movie (TMDB API) to/from Save for Later database"""
+
+    logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
+    user_id = logged_in_user.user_id
+    
+    if crud.get_media_by_imdb_id(imdb_id) == None:
+        media_title = request.json.get('title')
+        media_poster_path = request.json.get('poster_path')
+        media_overview = request.json.get('overview')
+        media_imdb_id = request.json.get('imdb_id')
+ 
+        
+        media_to_db = crud.create_media(
+                        media_type='movie', 
+                        title=media_title, 
+                        overview=media_overview, 
+                        poster_path=media_poster_path, 
+                        imdb_id=media_imdb_id)
+               
+        db.session.add(media_to_db)
+        db.session.commit()  
+
+    media = crud.get_media_by_imdb_id(imdb_id)
+
+    save_later_by_media_user_id = crud.get_save_for_later_by_media_user_id(user_id, media.media_id)
+
+    if save_later_by_media_user_id:
+        db.session.delete(save_later_by_media_user_id)
+    else:
+        save_for_later = crud.create_save_for_later(user_id=user_id, media_id=media.media_id)    
+        db.session.add(save_for_later)
+
+    db.session.commit()    
+
+    return 'success'
+
+
+@app.route('/media/popular/shows/details/<imdb_id>/save_for_later', methods=['POST'])
+def save_for_later_show(imdb_id):
+    """Add/Remove show (TMDB API) to/from Save for Later database"""
+
+    logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
+    user_id = logged_in_user.user_id
+    
+    if crud.get_media_by_imdb_id(imdb_id) == None:
+        media_title = request.json.get('title')
+        media_poster_path = request.json.get('poster_path')
+        media_overview = request.json.get('overview')
+        media_imdb_id = request.json.get('imdb_id')
+
+        
+        media_to_db = crud.create_media(
+                        media_type='series', 
+                        title=media_title, 
+                        overview=media_overview, 
+                        poster_path=media_poster_path, 
+                        imdb_id=media_imdb_id)
+               
+        db.session.add(media_to_db)
+        db.session.commit()  
+
+    media = crud.get_media_by_imdb_id(imdb_id)
+    print('*'*40)
+    print(media)
+    print('*'*40)
+    save_later_by_media_user_id = crud.get_save_for_later_by_media_user_id(user_id, media.media_id)
+
+    if save_later_by_media_user_id:
+        db.session.delete(save_later_by_media_user_id)
+    else:
+        save_for_later = crud.create_save_for_later(user_id=user_id, media_id=media.media_id)    
+        db.session.add(save_for_later)
+
+    db.session.commit()    
+
+    return 'success'
+
+
+
 @app.route('/search')
 def search_media():
+    """Search a media using Rapid API (IMDB)"""
+
     url = "https://movie-database-alternative.p.rapidapi.com/"
     headers = {
         "X-RapidAPI-Key": os.environ['RAPID_API_KEY'],
@@ -209,7 +360,7 @@ def search_media():
 
 @app.route('/media/details/<imdb_id>')
 def get_specific_media(imdb_id):
-    """Makes an API request to get a specific media by its ID"""
+    """Makes an API request to get a specific media by its ID (IMDB)"""
 
     url = "https://movie-database-alternative.p.rapidapi.com/"
 
@@ -224,20 +375,65 @@ def get_specific_media(imdb_id):
 
     data = response.json()
     media_info = crud.get_media_by_imdb_id(imdb_id)
+    if 'user_email' in session:
+        user = crud.get_user_by_email(session['user_email'])
+    else:
+        user = False  
 
 
     media = {'title': data['Title'], 
              'year': data['Year'], 
              'poster_path': data['Poster'], 
              'overview': data['Plot'], 
-             'media_id': data['imdbID'],
+             'imdb_id': data['imdbID'],
              'media_type': data['Type'] }
 
-    return render_template('media_details.html', media=media, media_info=media_info)
+
+    return render_template('media_details.html', media=media, media_info=media_info, user=user)
+
+
+@app.route('/media/details/<imdb_id>/save_for_later', methods=['POST'])
+def save_for_later_media(imdb_id):
+    """Add/Remove media (IMDB) to/from Save for Later database"""
+
+    logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
+    user_id = logged_in_user.user_id
+    
+    if crud.get_media_by_imdb_id(imdb_id) == None:
+        media_title = request.json.get('title')
+        media_poster_path = request.json.get('poster_path')
+        media_overview = request.json.get('overview')
+        media_imdb_id = request.json.get('imdb_id')
+        media_type = request.json.get('media_type')
+        
+        media_to_db = crud.create_media(
+                        media_type=media_type, 
+                        title=media_title, 
+                        overview=media_overview, 
+                        poster_path=media_poster_path, 
+                        imdb_id=media_imdb_id)
+        print(media_to_db)                   
+        db.session.add(media_to_db)
+        db.session.commit()  
+
+    media = crud.get_media_by_imdb_id(imdb_id)
+
+    save_later_by_media_user_id = crud.get_save_for_later_by_media_user_id(user_id, media.media_id)
+
+    if save_later_by_media_user_id:
+        db.session.delete(save_later_by_media_user_id)
+    else:
+        save_for_later = crud.create_save_for_later(user_id=user_id, media_id=media.media_id)    
+        db.session.add(save_for_later)
+
+    db.session.commit()    
+
+    return 'success'
+
 
 @app.route('/media/details/<comment_id>/update_like', methods=['POST'])
 def like_comment(comment_id):
-    """Add Like to the database"""
+    """Like/Unlike a comment and update in the database (IMDB)"""
 
     # user_id = request.json.get('userID')
     logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
@@ -247,7 +443,7 @@ def like_comment(comment_id):
    # like_id = request.json.get('likeID')
 
     like_by_id = crud.get_like_by_comment_user_id(comment_id=comment_id, user_id=user_id)
-    #print("Like exists?", like_by_id)
+    print("Like exists?", like_by_id)
     print("\n"*5)
 
     if like_by_id:
@@ -271,7 +467,8 @@ def show_details():
 
 @app.route('/media/details/<media_id>/comment', methods=['POST'])
 def comment_media(media_id):
-
+    """Submit a comment for a specific show 
+    from Rapid API (IMDB) and save both on the database"""
 
     media_title = request.json.get('title')
     media_year = request.json.get('year')
@@ -320,6 +517,7 @@ def comment_media(media_id):
 @app.route('/login')
 def login_page():
     """Show log in page"""
+
     if 'user_email' in session:
         user = crud.get_user_by_email(session['user_email'])
         user_id = user.user_id
@@ -353,7 +551,7 @@ def logout():
     return redirect('/')
 
 @app.route('/signup')
-def signin_page():
+def signup_page():
     return render_template('signup.html')
 
 
@@ -370,7 +568,7 @@ def register_user():
 
     if user:
         flash("Cannot create an account with that email. Try again.")
-        return redirect('/signin')
+        return redirect('/signup')
     else:
         if password == confirm_password:
             user = crud.create_user(fullname, email, password)
@@ -379,7 +577,7 @@ def register_user():
             flash("Account created! Please, log in.")
         else:
             flash("Password do not match. Try again.")
-            return redirect('signin')
+            return redirect('signup')
 
     return render_template('login.html')
 
@@ -393,8 +591,34 @@ def show_profile(user_id):
 
 
 
+
     return render_template('profile.html', user=user)
 
+
+@app.route('/profile/<user_id>/friend')
+def show_friend_profile(user_id):
+    """Show users profile"""
+
+    user = crud.get_user_by_id(user_id)
+
+    return render_template('profile.html', user=user)    
+
+@app.route('/profile/<user_id>/friend/update_follow', methods=["POST"])
+def update_followrs(user_id):
+
+    logged_in_user = crud.get_user_by_email(session['user_email'])
+    user_to_follow = crud.get_user_by_id(user_id)
+
+    if user_to_follow in logged_in_user.following:
+        logged_in_user.following.remove(user_to_follow)
+    else:
+        logged_in_user.following.append(user_to_follow)
+
+    db.session.commit()
+    print('*'*30)
+    print(logged_in_user.following)
+
+    return 'success'
 
 if __name__ == "__main__":
     # DebugToolbarExtension(app)

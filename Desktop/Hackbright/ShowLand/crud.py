@@ -1,5 +1,5 @@
 """CRUD operations"""
-from model import db, User, Media, Comment, SaveForLater, Like
+from model import db, User, Media, Comment, SaveForLater, Like, connect_to_db
 
 
 def create_user(full_name, email, password):
@@ -11,6 +11,11 @@ def create_user(full_name, email, password):
 
     return user
 
+
+def get_user_by_id(user_id):
+    """Return an user by ID."""
+
+    return User.query.filter_by(user_id=user_id).first()
 
 def get_user_by_email(email):
     """Return a user by email."""
@@ -49,6 +54,7 @@ def create_like(user_id, comment_id):
     
     return like
 
+
 def get_like_by_comment_user_id(comment_id, user_id):
 
     like_by_id = Like.query.filter_by(comment_id=comment_id, user_id=user_id ).first()
@@ -61,6 +67,18 @@ def get_like_numbers_by_comment_id(comment_id):
     like_numbers = like.count()
 
     return like_numbers
+
+def create_save_for_later(user_id, media_id):
+    
+    save_for_later = SaveForLater(user_id=user_id, media_id=media_id)
+    
+    return save_for_later
+
+def get_save_for_later_by_media_user_id(user_id, media_id):
+
+    save_later_by_media_usar_id = SaveForLater.query.filter_by(user_id=user_id,media_id=media_id).first()    
+
+    return save_later_by_media_usar_id
 
 
 

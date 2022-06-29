@@ -32,8 +32,8 @@
                     {%else%}
                     <a class="nav-link" id="navbar-login" href="/login">Profile</a>
                     <a class="nav-link" id="navbar-logout" href="/logout">Log Out</a>
-                    <!-- <a class="nav-link" id="navbar-signup" href="/signup">Sign Up</a>                    
-                    <a class="nav-link disabled">Disabled</a> -->
+                    <a class="nav-link" id="navbar-account" href="/profile">Logged in as {{session['user_email']}}</a>
+
                     {%endif%}
                 </div>
             </div>
