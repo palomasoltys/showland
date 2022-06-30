@@ -9,8 +9,17 @@
 <h2>Hey {{user.full_name}}!</h2>
 {%else%}
 <h2>{{user.full_name}}'s profile</h2>
-<button type="button" id="follow-user" value="{{user.user_id}}" class="btn btn-outline-danger like-btn">Follow</button>
+{%if is_following %}
+{% set ns = namespace(follow='Unfollow') %}
+
+{%else%}
+{% set ns.follow = 'Unfollow' %}
+
 {%endif%}
+<button type="button" id="follow-user" value="{{user.user_id}}" class="btn btn-outline-danger follow-btn">{{ns.follow}}</button>
+{%endif%}
+
+
 
 <h3>Activity</h3>
 <ul>

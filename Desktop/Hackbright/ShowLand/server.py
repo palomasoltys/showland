@@ -375,6 +375,7 @@ def get_specific_media(imdb_id):
 
     data = response.json()
     media_info = crud.get_media_by_imdb_id(imdb_id)
+
     if 'user_email' in session:
         user = crud.get_user_by_email(session['user_email'])
     else:
@@ -522,7 +523,6 @@ def login_page():
         user = crud.get_user_by_email(session['user_email'])
         user_id = user.user_id
         return redirect(f'/profile/{user_id}')
-      #  return render_template('profile.html', user=user)
     else:    
         return render_template('login.html')
 
@@ -589,9 +589,6 @@ def show_profile(user_id):
     user = crud.get_user_by_email(session['user_email'])
     user_id = user_id
 
-
-
-
     return render_template('profile.html', user=user)
 
 
@@ -599,9 +596,12 @@ def show_profile(user_id):
 def show_friend_profile(user_id):
     """Show users profile"""
 
-    user = crud.get_user_by_id(user_id)
+    friend_user = crud.get_user_by_id(user_id)
+    logged_in_user = crud.get_user_by_email(session['user_email'])
 
-    return render_template('profile.html', user=user)    
+    is_following = friend_user in logged_in_user.following
+
+    return render_template('profile.html', user=friend_user, is_following=is_following)    
 
 @app.route('/profile/<user_id>/friend/update_follow', methods=["POST"])
 def update_followrs(user_id):
@@ -611,12 +611,12 @@ def update_followrs(user_id):
 
     if user_to_follow in logged_in_user.following:
         logged_in_user.following.remove(user_to_follow)
+
     else:
         logged_in_user.following.append(user_to_follow)
 
+
     db.session.commit()
-    print('*'*30)
-    print(logged_in_user.following)
 
     return 'success'
 
