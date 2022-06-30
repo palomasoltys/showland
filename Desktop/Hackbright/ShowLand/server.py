@@ -95,7 +95,9 @@ def get_popular_movie(tmdb_id):
 
     movie_info = crud.get_media_by_imdb_id(str(movie['movie_id']))
 
-    user = crud.get_user_by_email(session['user_email'])
+    user = None
+    if 'user_email' in session:
+        user = crud.get_user_by_email(session['user_email'])
 
     return render_template('movie_popular_details.html', movie=movie, movie_info=movie_info, user=user )
 
@@ -461,6 +463,16 @@ def like_comment(comment_id):
     # if the like exists for that comment, delete it from the datavase, else add the like to the db.
 
     return str(number_likes)
+
+
+@app.route('/media/details/<comment_id>/delete_comment')    
+def delete_comment(comment_id):
+
+    comment = crud.get_comment_by_id(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+
+    return 'Your comment was deleted.'
 
 @app.route('/media/details/')
 def show_details():

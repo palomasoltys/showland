@@ -132,3 +132,27 @@ for (const laterBtn of saveForLaterBtn) {
       });
   });
 }
+
+const deleteCommentBtn = document.querySelectorAll('.delete-comment-btn');
+console.log(deleteCommentBtn);
+for (const deleteBtn of deleteCommentBtn) {
+  deleteBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    const deleteCommentID = deleteBtn.value;
+    user_id = document.getElementById('media-user-id-p').innerText;
+    console.log(deleteCommentID);
+    console.log(user_id);
+    fetch(`/media/details/${deleteCommentID}/delete_comment`)
+      .then((response) => response.text())
+      .then((data) => {
+        commentBlock = document.getElementById(`${deleteCommentID}`);
+        commentBlock.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        likeBtn = document.getElementById(
+          `comment${deleteCommentID}-user${user_id}`,
+        );
+        likeBtn.style.display = 'none';
+        commentBlock.innerHTML = 'Your comment was removed!';
+      });
+  });
+}

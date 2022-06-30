@@ -48,6 +48,11 @@ def create_comment(comment, review, media_id, user_id,):
 
     return comment
 
+def get_comment_by_id(comment_id):
+
+    comment = Comment.query.filter_by(comment_id=comment_id).first()    
+    return comment
+
 def create_like(user_id, comment_id):
 
     like = Like(user_id=user_id, comment_id=comment_id) 

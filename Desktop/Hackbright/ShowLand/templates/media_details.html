@@ -11,12 +11,14 @@
 
 {% block body %}
 
+<!-- Information about a specific Media -->
 <h2>MEDIA DETAILS HERE</h2>
 <div class="media-details">
     <h2 id="media-title">{{media.title}}</h2>
     <p id="media-year">{{media.year}}</p>
     <p id="media-overview">{{media.overview}}</p>
 
+    <!-- Button for Save for Later List -->
     {%if 'user_email' in session %}
     {% set nspace = namespace(save='Save for Later') %}
     {%for data in user.savelater%}
@@ -34,7 +36,8 @@
 </div>
 
 <div class="comment-area">
-    <!-- Button trigger modal -->
+
+    <!-- Button trigger modal to comment and rate a media -->
     <label for="comment-media-btn">Have you already watched it?</label>
     {%if 'user_email' in session %}
     <button type="button" class="btn btn-primary" id="comment-media-btn" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -45,7 +48,8 @@
         <button type="submit">Log In to comment</button>
     </form>
     {%endif%}
-    <!-- Modal -->
+
+    <!-- Modal for Rate and Comment a Media-->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
@@ -66,13 +70,8 @@
                         <label for="comment-media">Leave a comment:</label>
                         <input type="text" id="comment-media" name="comment-media">
                         <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="submit-comment-btn">Submit Comment</button>
-                        <!-- <input type="submit" value="Submit Comment and Review"> -->
                     </form>
                 </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Submit Comment</button>
-                </div> -->
             </div>
         </div>
     </div>
@@ -83,17 +82,27 @@
 <p hidden id="session-user-email">{{session['user_email']}}</p>
 {%endif%}
 
+<!-- Displaying media comments -->
 {%if media_info != None%}
 {%for item in media_info.comments%}
-<a href="/profile/{{item.user.user_id}}/friend" id="media-user-fullname-p">{{item.user.full_name}}</a>
-<p hidden id="media-user-id">{{item.user.email}}</p>
-<p id="media-review-p">{{item.review}}</p>
-<p id="media-comment-p">{{item.comment}}</p>
-<p hidden>{{item.comment_id}}</p>
-<p hidden id="media-user-id-p">{{item.user.user_id}}</p>
-<p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+<div id="{{item.comment_id}}" class="comment-block">
+    <a href="/profile/{{item.user.user_id}}/friend" id="media-user-fullname-p">{{item.user.full_name}}</a>
+    <p hidden id="media-user-id">{{item.user.email}}</p>
+    <p id="media-review-p">{{item.review}}</p>
+    <p id="media-comment-p">{{item.comment}}</p>
+    <p hidden>{{item.comment_id}}</p>
+    <p hidden id="media-user-id-p">{{item.user.user_id}}</p>
+    <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+</div>
 
 {%if 'user_email' in session %}
+
+<!-- Delete button for comments -->
+{%if item.user.user_id == user.user_id%}
+<button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
+{%endif%}
+
+<!-- Like/Unlike button for comments -->
 {% set ns = namespace(like='Like') %}
 {%for like in item.likes%}
 {%if like.user.email == session['user_email']%}
@@ -107,6 +116,8 @@
 {%endif%}
 {%endfor%}
 {%endif%}
+
+
 {%if media_info == None or media_info.comments|length == 0%}
 <p><i>Be the first one to comment</i></p>
 
