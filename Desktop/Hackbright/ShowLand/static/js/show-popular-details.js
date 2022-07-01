@@ -126,3 +126,25 @@ for (const laterBtn of saveForLaterBtn) {
       });
   });
 }
+
+const deleteCommentBtn = document.querySelectorAll('.delete-comment-btn');
+
+for (const deleteBtn of deleteCommentBtn) {
+  deleteBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    const deleteCommentID = deleteBtn.value;
+    console.log(deleteCommentID);
+    fetch(`/media/popular/shows/details/${deleteCommentID}/delete_comment`)
+      .then((response) => response.text())
+      .then((user_id_who_commented) => {
+        commentBlock = document.getElementById(`${deleteCommentID}`);
+        console.log(user_id_who_commented);
+        commentBlock.style.display = 'none';
+        deleteBtn.style.display = 'none';
+        likeBtn = document.getElementById(
+          `comment${deleteCommentID}-user${user_id_who_commented}`,
+        );
+        likeBtn.style.display = 'none';
+      });
+  });
+}
