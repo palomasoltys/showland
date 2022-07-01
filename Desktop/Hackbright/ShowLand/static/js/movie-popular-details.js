@@ -9,7 +9,7 @@ const movieID = document.querySelector('#movie-id').innerText;
 const commentFormMovie = document.querySelector('#comment-form-movie');
 commentFormMovie.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  console.log(movieOverview);
+
   const select = document.querySelector('#rate-movie');
   const movieRate = select.options[select.selectedIndex].value;
   const movieComment = document.querySelector('#comment-movie').value;
@@ -121,6 +121,36 @@ for (const laterBtn of saveForLaterBtn) {
           laterBtn.innerText = 'Save for Later';
         }
         console.log(laterBtn.innerText);
+      });
+  });
+}
+
+const deleteCommentBtn = document.querySelectorAll('.delete-comment-btn');
+
+for (const deleteBtn of deleteCommentBtn) {
+  deleteBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    const deleteCommentID = deleteBtn.value;
+    console.log(deleteCommentID);
+    fetch(`/media/popular/movies/details/${deleteCommentID}/delete_comment`)
+      .then((response) => response.text())
+      .then((user_id) => {
+        commentBlock = document.getElementById(`delete${deleteCommentID}`);
+
+        commentBlock.style.display = 'none';
+
+        deleteBtn.style.display = 'none';
+
+        likeBtn = document.getElementById(
+          `comment${deleteCommentID}-user${user_id}`,
+        );
+
+        likeBtn.style.display = 'none';
+
+        likeNumber = document.getElementById(
+          `number-likes-${deleteCommentID}-p`,
+        );
+        likeNumber.style.display = 'none';
       });
   });
 }

@@ -337,6 +337,18 @@ def save_for_later_show(imdb_id):
     return 'success'
 
 
+@app.route('/media/popular/movies/details/<comment_id>/delete_comment')
+def delete_comment_popular_movie(comment_id):
+
+
+    comment = crud.get_comment_by_id(comment_id)
+    user_who_commented = comment.user
+    user_id_who_commented = str(user_who_commented.user_id)
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return user_id_who_commented
 
 @app.route('/search')
 def search_media():
@@ -469,11 +481,9 @@ def delete_comment(comment_id):
     comment = crud.get_comment_by_id(comment_id)
     user_who_commented = comment.user
     user_id_who_commented = str(user_who_commented.user_id)
+   
+    crud.delete_comment_by_id(comment_id)
 
-    db.session.delete(comment)
-    db.session.commit()
-
-    
 
     return user_id_who_commented
 

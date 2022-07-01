@@ -89,38 +89,39 @@
 {%endif%}
 {%if movie_info != None %}
 {%for item in movie_info.comments%}
-<p id="movie-user-fullname-p">{{item.user.full_name}}</p>
-<p id="movie-review-p">{{item.review}}</p>
-<p id="movie-comment-p">{{item.comment}}</p>
-<p hidden>{{item.comment_id}}</p>
-<p hidden id="movie-user-id-p">{{item.user.user_id}}</p>
-<p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+<div id="comment-block-{{item.comment_id}}">
+    <p id="movie-user-fullname-p">{{item.user.full_name}}</p>
+    <p id="movie-review-p">{{item.review}}</p>
+    <p id="movie-comment-p">{{item.comment}}</p>
+    <p hidden>{{item.comment_id}}</p>
+    <p hidden id="movie-user-id-p">{{item.user.user_id}}</p>
+    <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
 
-{%if 'user_email' in session %}
+    {%if 'user_email' in session %}
 
-<!-- Delete button for comments -->
-{%if item.user.user_id == user.user_id%}
-<button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
-{%endif%}
+    <!-- Delete button for comments -->
+    {%if item.user.user_id == user.user_id%}
+    <button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
+    {%endif%}
 
-{% set ns = namespace(like='Like') %}
-{%for like in item.likes%}
-{%if like.user.email == session['user_email']%}
-{% set ns.like = 'Unlike' %}
-{%endif%}
-{%endfor%}
-<button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}}</button>
+    {% set ns = namespace(like='Like') %}
+    {%for like in item.likes%}
+    {%if like.user.email == session['user_email']%}
+    {% set ns.like = 'Unlike' %}
+    {%endif%}
+    {%endfor%}
+    <button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}}</button>
 
-{%endif%}
-{%endfor%}
-{%endif%}
+    {%endif%}
+    {%endfor%}
+    {%endif%}
 
-{%if movie_info == None or movie_info.comments|length == 0%}
-<p><i>Be the first one to comment</i></p>
+    {%if movie_info == None or movie_info.comments|length == 0%}
+    <p><i>Be the first one to comment</i></p>
 
-{%endif%}
+    {%endif%}
 
-
+</div>
 <script src="/static/js/movie-popular-details.js"> </script>
 
 {% endblock %}

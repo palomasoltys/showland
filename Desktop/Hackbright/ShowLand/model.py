@@ -119,7 +119,7 @@ class Like(db.Model):
     user = db.relationship("User", backref="likes")
 
     def __repr__(self):
-        return f"<Like like_id = {self.like_id} / media_id = {self.comment_id} / user_id = {self.user_id}>"
+        return f"<Like like_id = {self.like_id} / comment_id = {self.comment_id} / user_id = {self.user_id}>"
 
 
 

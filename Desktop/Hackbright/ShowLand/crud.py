@@ -53,6 +53,23 @@ def get_comment_by_id(comment_id):
     comment = Comment.query.filter_by(comment_id=comment_id).first()    
     return comment
 
+
+def delete_likes_by_comment_id(comment_id):
+
+    likes = Like.query.filter_by(comment_id=comment_id).all()
+    for like in likes:
+        db.session.delete(like)
+        db.session.commit()
+
+
+def delete_comment_by_id(comment_id):
+
+    comment = Comment.query.get(comment_id)
+    if comment.likes:
+        delete_likes_by_comment_id(comment_id)
+    db.session.delete(comment)
+    db.session.commit()
+
 def create_like(user_id, comment_id):
 
     like = Like(user_id=user_id, comment_id=comment_id) 
