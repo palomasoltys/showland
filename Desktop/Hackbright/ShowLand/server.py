@@ -350,6 +350,19 @@ def delete_comment_popular_movie(comment_id):
 
     return user_id_who_commented
 
+@app.route('/media/popular/shows/details/<comment_id>/delete_comment')
+def delete_comment_popular_show(comment_id):
+
+
+    comment = crud.get_comment_by_id(comment_id)
+    user_who_commented = comment.user
+    user_id_who_commented = str(user_who_commented.user_id)
+   
+    crud.delete_comment_by_id(comment_id)
+
+
+    return user_id_who_commented    
+
 @app.route('/search')
 def search_media():
     """Search a media using Rapid API (IMDB)"""
