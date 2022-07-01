@@ -344,9 +344,9 @@ def delete_comment_popular_movie(comment_id):
     comment = crud.get_comment_by_id(comment_id)
     user_who_commented = comment.user
     user_id_who_commented = str(user_who_commented.user_id)
+   
+    crud.delete_comment_by_id(comment_id)
 
-    db.session.delete(comment)
-    db.session.commit()
 
     return user_id_who_commented
 

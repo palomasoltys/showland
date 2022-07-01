@@ -144,16 +144,10 @@ for (const deleteBtn of deleteCommentBtn) {
         commentBlock = document.getElementById(`${deleteCommentID}`);
         console.log(user_id_who_commented);
         commentBlock.style.display = 'none';
-
-        console.log(
-          `LIKE BTN ID: comment${deleteCommentID}-user${user_id_who_commented}`,
-        );
         deleteBtn.style.display = 'none';
-
         likeBtn = document.getElementById(
           `comment${deleteCommentID}-user${user_id_who_commented}`,
         );
-        console.log(`LIKE BTN I WANT TO DELETE: ${likeBtn}`);
         likeBtn.style.display = 'none';
       });
   });

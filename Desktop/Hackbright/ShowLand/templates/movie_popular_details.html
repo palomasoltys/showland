@@ -90,13 +90,14 @@
 {%if movie_info != None %}
 {%for item in movie_info.comments%}
 <div id="comment-block-{{item.comment_id}}">
-    <p id="movie-user-fullname-p">{{item.user.full_name}}</p>
-    <p id="movie-review-p">{{item.review}}</p>
-    <p id="movie-comment-p">{{item.comment}}</p>
-    <p hidden>{{item.comment_id}}</p>
-    <p hidden id="movie-user-id-p">{{item.user.user_id}}</p>
-    <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
-
+    <div id="{{item.comment_id}}" class="comment-block">
+        <p id="movie-user-fullname-p">{{item.user.full_name}}</p>
+        <p id="movie-review-p">{{item.review}}</p>
+        <p id="movie-comment-p">{{item.comment}}</p>
+        <p hidden>{{item.comment_id}}</p>
+        <p hidden id="movie-user-id-p">{{item.user.user_id}}</p>
+        <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+    </div>
     {%if 'user_email' in session %}
 
     <!-- Delete button for comments -->

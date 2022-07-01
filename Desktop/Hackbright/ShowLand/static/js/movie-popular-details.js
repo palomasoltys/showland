@@ -134,23 +134,15 @@ for (const deleteBtn of deleteCommentBtn) {
     console.log(deleteCommentID);
     fetch(`/media/popular/movies/details/${deleteCommentID}/delete_comment`)
       .then((response) => response.text())
-      .then((user_id) => {
-        commentBlock = document.getElementById(`delete${deleteCommentID}`);
-
+      .then((user_id_who_commented) => {
+        commentBlock = document.getElementById(`${deleteCommentID}`);
+        console.log(user_id_who_commented);
         commentBlock.style.display = 'none';
-
         deleteBtn.style.display = 'none';
-
         likeBtn = document.getElementById(
-          `comment${deleteCommentID}-user${user_id}`,
+          `comment${deleteCommentID}-user${user_id_who_commented}`,
         );
-
         likeBtn.style.display = 'none';
-
-        likeNumber = document.getElementById(
-          `number-likes-${deleteCommentID}-p`,
-        );
-        likeNumber.style.display = 'none';
       });
   });
 }
