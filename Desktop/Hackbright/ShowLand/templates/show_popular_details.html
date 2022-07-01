@@ -89,29 +89,38 @@
 {%endif%}
 {%if show_info != None %}
 {%for item in show_info.comments%}
-<p id="show-user-fullname-p">{{item.user.full_name}}</p>
-<p id="show-review-p">{{item.review}}</p>
-<p id="show-comment-p">{{item.comment}}</p>
-<p hidden>{{item.comment_id}}</p>
-<p hidden id="show-user-id-p">{{item.user.user_id}}</p>
-<p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+<div id="comment-block-{{item.comment_id}}">
+    <div id="{{item.comment_id}}" class="comment-block">
+        <p id="show-user-fullname-p">{{item.user.full_name}}</p>
+        <p id="show-review-p">{{item.review}}</p>
+        <p id="show-comment-p">{{item.comment}}</p>
+        <p hidden>{{item.comment_id}}</p>
+        <p hidden id="show-user-id-p">{{item.user.user_id}}</p>
+        <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+    </div>
 
-{%if 'user_email' in session %}
-{% set ns = namespace(like='Like') %}
-{%for like in item.likes%}
-{%if like.user.email == session['user_email']%}
-{% set ns.like = 'Unlike' %}
-{%endif%}
-{%endfor%}
-<button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}} </button>
-{%endif%}
-{%endfor%}
-{%endif%}
-{%if show_info == None or show_info.comments|length == 0%}
-<p><i>Be the first one to comment</i></p>
+    {%if 'user_email' in session %}
 
-{%endif%}
+    <!-- Delete button for comments -->
+    {%if item.user.user_id == user.user_id%}
+    <button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
+    {%endif%}
 
+    {% set ns = namespace(like='Like') %}
+    {%for like in item.likes%}
+    {%if like.user.email == session['user_email']%}
+    {% set ns.like = 'Unlike' %}
+    {%endif%}
+    {%endfor%}
+    <button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}} </button>
+    {%endif%}
+    {%endfor%}
+    {%endif%}
+    {%if show_info == None or show_info.comments|length == 0%}
+    <p><i>Be the first one to comment</i></p>
+
+    {%endif%}
+</div>
 <script src="/static/js/show-popular-details.js"> </script>
 
 {% endblock %}
