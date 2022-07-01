@@ -1,7 +1,5 @@
 'use-strict';
 
-// Add an event listener to my drop comment btn
-
 const mediaTitle = document.querySelector('#media-title').innerText;
 const mediaYear = document.querySelector('#media-year').innerText;
 const mediaPosterPath = document.querySelector('#media-poster-path').src;
@@ -34,15 +32,15 @@ commentForm.addEventListener('submit', (evt) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(mediaInformation),
-  }).then((response) => {
-    if (response.ok) {
+  })
+    .then((response) => response.text())
+    .then((data) => {
       alert('Your comment was submited!');
-      // IF I DO THIS \/ IT WILL ONLY SHOW UP THE FIRST TIME.
-      // IF I RELOAD THE PAGE, IT WON'T SHOW THE COMMENT UP
-      // document.querySelector('#media-details-div').innerHTML = mediaRate;
-      // document.querySelector('#media-details-div').innerHTML += mediaComment;
-    }
-  });
+      // console.log(`comment-block-${data}`);
+      // commentDiv = document.getElementById(`comment-block-${data}`);
+      // console.log(commentDiv);
+      // commentDiv.style.display = 'block';
+    });
 });
 
 const likeButton = document.querySelectorAll('.like-btn');
@@ -134,25 +132,25 @@ for (const laterBtn of saveForLaterBtn) {
 }
 
 const deleteCommentBtn = document.querySelectorAll('.delete-comment-btn');
-console.log(deleteCommentBtn);
+
 for (const deleteBtn of deleteCommentBtn) {
   deleteBtn.addEventListener('click', (evt) => {
     evt.preventDefault();
     const deleteCommentID = deleteBtn.value;
-    user_id = document.getElementById('media-user-id-p').innerText;
-    console.log(deleteCommentID);
-    console.log(user_id);
+
     fetch(`/media/details/${deleteCommentID}/delete_comment`)
       .then((response) => response.text())
-      .then((data) => {
+      .then((user_id) => {
         commentBlock = document.getElementById(`${deleteCommentID}`);
         commentBlock.style.display = 'none';
+
         deleteBtn.style.display = 'none';
+
         likeBtn = document.getElementById(
           `comment${deleteCommentID}-user${user_id}`,
         );
+        console.log(`LIKE BTN I WANT TO DELETE: ${likeBtn}`);
         likeBtn.style.display = 'none';
-        commentBlock.innerHTML = 'Your comment was removed!';
       });
   });
 }

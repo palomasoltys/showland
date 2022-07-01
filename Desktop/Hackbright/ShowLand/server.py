@@ -304,7 +304,7 @@ def save_for_later_show(imdb_id):
 
     logged_in_user = crud.get_user_by_email(request.json.get('userEmail'))
     user_id = logged_in_user.user_id
-    
+    print(user_id)
     if crud.get_media_by_imdb_id(imdb_id) == None:
         media_title = request.json.get('title')
         media_poster_path = request.json.get('poster_path')
@@ -323,9 +323,7 @@ def save_for_later_show(imdb_id):
         db.session.commit()  
 
     media = crud.get_media_by_imdb_id(imdb_id)
-    print('*'*40)
-    print(media)
-    print('*'*40)
+
     save_later_by_media_user_id = crud.get_save_for_later_by_media_user_id(user_id, media.media_id)
 
     if save_later_by_media_user_id:
@@ -469,10 +467,15 @@ def like_comment(comment_id):
 def delete_comment(comment_id):
 
     comment = crud.get_comment_by_id(comment_id)
+    user_who_commented = comment.user
+    user_id_who_commented = str(user_who_commented.user_id)
+
     db.session.delete(comment)
     db.session.commit()
 
-    return 'Your comment was deleted.'
+    
+
+    return user_id_who_commented
 
 @app.route('/media/details/')
 def show_details():
@@ -522,9 +525,9 @@ def comment_media(media_id):
         db.session.add(user_comment)
         db.session.commit()
     
-  
+    comment_id = user_comment.comment_id
 
-    return 'success'
+    return str(comment_id)
 
 
 @app.route('/login')

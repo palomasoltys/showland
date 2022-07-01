@@ -85,43 +85,45 @@
 <!-- Displaying media comments -->
 {%if media_info != None%}
 {%for item in media_info.comments%}
-<div id="{{item.comment_id}}" class="comment-block">
-    <a href="/profile/{{item.user.user_id}}/friend" id="media-user-fullname-p">{{item.user.full_name}}</a>
-    <p hidden id="media-user-id">{{item.user.email}}</p>
-    <p id="media-review-p">{{item.review}}</p>
-    <p id="media-comment-p">{{item.comment}}</p>
-    <p hidden>{{item.comment_id}}</p>
-    <p hidden id="media-user-id-p">{{item.user.user_id}}</p>
-    <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
-</div>
+<div id="comment-block-{{item.comment_id}}">
+    <div id="{{item.comment_id}}" class="comment-block">
+        <a href="/profile/{{item.user.user_id}}/friend" id="media-user-fullname-p">{{item.user.full_name}}</a>
+        <p hidden id="media-user-id">{{item.user.email}}</p>
+        <p id="media-review-p">{{item.review}}</p>
+        <p id="media-comment-p">{{item.comment}}</p>
+        <p hidden>{{item.comment_id}}</p>
+        <p hidden id="media-user-id-p">{{item.user.user_id}}</p>
+        <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
+    </div>
 
-{%if 'user_email' in session %}
+    {%if 'user_email' in session %}
 
-<!-- Delete button for comments -->
-{%if item.user.user_id == user.user_id%}
-<button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
-{%endif%}
+    <!-- Delete button for comments -->
+    {%if item.user.user_id == user.user_id%}
+    <button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
+    {%endif%}
 
-<!-- Like/Unlike button for comments -->
-{% set ns = namespace(like='Like') %}
-{%for like in item.likes%}
-{%if like.user.email == session['user_email']%}
-{% set ns.like = 'Unlike' %}
-{%endif%}
-{%endfor%}
-<button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}}</button>
-<!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16">
+    <!-- Like/Unlike button for comments -->
+    {% set ns = namespace(like='Like') %}
+    {%for like in item.likes%}
+    {%if like.user.email == session['user_email']%}
+    {% set ns.like = 'Unlike' %}
+    {%endif%}
+    {%endfor%}
+    <button type="button" id="comment{{item.comment_id}}-user{{item.user.user_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger like-btn">{{ns.like}}</button>
+    <!-- <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hand-thumbs-up-fill" viewBox="0 0 16 16">
                     <path d="M6.956 1.745C7.021.81 7.908.087 8.864.325l.261.066c.463.116.874.456 1.012.965.22.816.533 2.511.062 4.51a9.84 9.84 0 0 1 .443-.051c.713-.065 1.669-.072 2.516.21.518.173.994.681 1.2 1.273.184.532.16 1.162-.234 1.733.058.119.103.242.138.363.077.27.113.567.113.856 0 .289-.036.586-.113.856-.039.135-.09.273-.16.404.169.387.107.819-.003 1.148a3.163 3.163 0 0 1-.488.901c.054.152.076.312.076.465 0 .305-.089.625-.253.912C13.1 15.522 12.437 16 11.5 16H8c-.605 0-1.07-.081-1.466-.218a4.82 4.82 0 0 1-.97-.484l-.048-.03c-.504-.307-.999-.609-2.068-.722C2.682 14.464 2 13.846 2 13V9c0-.85.685-1.432 1.357-1.615.849-.232 1.574-.787 2.132-1.41.56-.627.914-1.28 1.039-1.639.199-.575.356-1.539.428-2.59z" />
                 </svg> -->
-{%endif%}
-{%endfor%}
-{%endif%}
+    {%endif%}
+    {%endfor%}
+    {%endif%}
 
 
-{%if media_info == None or media_info.comments|length == 0%}
-<p><i>Be the first one to comment</i></p>
+    {%if media_info == None or media_info.comments|length == 0%}
+    <p><i>Be the first one to comment</i></p>
 
-{%endif%}
+    {%endif%}
+</div>
 <script src="/static/js/media-details.js"> </script>
 
 {% endblock %}
