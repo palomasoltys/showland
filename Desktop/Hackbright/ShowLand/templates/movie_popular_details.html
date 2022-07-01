@@ -97,6 +97,12 @@
 <p id="number-likes-{{item.comment_id}}-p">{{item.likes|length}}</p>
 
 {%if 'user_email' in session %}
+
+<!-- Delete button for comments -->
+{%if item.user.user_id == user.user_id%}
+<button type="button" id="delete{{item.comment_id}}" value="{{item.comment_id}}" class="btn btn-outline-danger delete-comment-btn">Delete</button>
+{%endif%}
+
 {% set ns = namespace(like='Like') %}
 {%for like in item.likes%}
 {%if like.user.email == session['user_email']%}
